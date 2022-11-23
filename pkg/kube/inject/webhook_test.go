@@ -946,6 +946,63 @@ func TestRunAndServe(t *testing.T) {
 	validReviewV1 := makeTestData(t, false, "v1")
 	skipReview := makeTestData(t, true, "v1beta1")
 
+	// nolint: lll
+	var validPatch := []byte(`[
+{
+    "op": "add",
+    "path": "/metadata/annotations",
+    "value": {
+        "prometheus.io/path": "/stats/prometheus",
+        "prometheus.io/port": "15020",
+        "prometheus.io/scrape": "true",
+        "sidecar.istio.io/status": "{\"initContainers\":[\"istio-init\"],\"containers\":[\"istio-proxy\"],\"volumes\":[\"istio-envoy\"],\"imagePullSecrets\":[\"istio-image-pull-secrets\"],\"revision\":\"default\"}"
+    }
+},
+{
+    "op": "add",
+    "path": "/spec/volumes/1",
+    "value": {
+        "name": "v0"
+    }
+},
+{
+    "op": "replace",
+    "path": "/spec/volumes/0/name",
+    "value": "istio-envoy"
+},
+{
+    "op": "add",
+    "path": "/spec/initContainers/1",
+    "value": {
+        "name": "istio-init",
+        "resources": {}
+    }
+},
+{
+    "op": "add",
+    "path": "/spec/containers/1",
+    "value": {
+        "name": "istio-proxy",
+        "resources": {},
+		"securityContext": {
+		    "runAsUser": 1337
+		}
+    }
+},
+{
+    "op": "add",
+    "path": "/spec/imagePullSecrets/1",
+    "value": {
+        "name": "p0"
+    }
+},
+{
+    "op": "replace",
+    "path": "/spec/imagePullSecrets/0/name",
+    "value": "istio-image-pull-secrets"
+}
+]`)
+
 	cases := []struct {
 		name           string
 		body           []byte
