@@ -136,7 +136,7 @@ spec:
           readOnlyRootFilesystem: true
           runAsGroup: 4321
           runAsNonRoot: false
-          runAsUser: 0
+          runAsUser: 1337
         startupProbe:
           failureThreshold: 600
           httpGet:
@@ -169,7 +169,7 @@ spec:
         - -z
         - "15006"
         - -u
-        - "1234"
+        - "1337"
         - -m
         - TPROXY
         - -i

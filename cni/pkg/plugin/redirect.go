@@ -217,7 +217,7 @@ func NewRedirect(pi *PodInfo) (*Redirect, error) {
 		return nil, fmt.Errorf("annotation value error for value %s; annotationFound = %t: %v",
 			"redirectMode", isFound, valErr)
 	}
-
+	redir.noRedirectUID = defaultNoRedirectUID
 	if pi.ProxyUID != nil && *pi.ProxyUID != 0 {
 		redir.noRedirectUID = fmt.Sprintf("%d", *pi.ProxyUID)
 	} else {

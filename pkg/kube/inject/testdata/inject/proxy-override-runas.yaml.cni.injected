@@ -138,7 +138,7 @@ spec:
           readOnlyRootFilesystem: true
           runAsGroup: 4321
           runAsNonRoot: true
-          runAsUser: 1234
+          runAsUser: 1337
         startupProbe:
           failureThreshold: 600
           httpGet:
@@ -171,7 +171,7 @@ spec:
         - -z
         - "15006"
         - -u
-        - "1234"
+        - "1337"
         - -m
         - REDIRECT
         - -i
@@ -203,7 +203,7 @@ spec:
           readOnlyRootFilesystem: true
           runAsGroup: 4321
           runAsNonRoot: true
-          runAsUser: 1234
+          runAsUser: 1337
       volumes:
       - name: workload-socket
       - name: credential-socket

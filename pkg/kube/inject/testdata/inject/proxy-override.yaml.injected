@@ -148,7 +148,7 @@ spec:
           readOnlyRootFilesystem: false
           runAsGroup: 1234
           runAsNonRoot: true
-          runAsUser: 1234
+          runAsUser: 1337
         startupProbe:
           failureThreshold: 600
           httpGet:
