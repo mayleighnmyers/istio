@@ -19,7 +19,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
-
 	maistrainformersfederationv1 "maistra.io/api/client/informers/externalversions/federation/v1"
 	maistraclient "maistra.io/api/client/versioned"
 	maistraxnsinformer "maistra.io/api/client/xnsinformer"

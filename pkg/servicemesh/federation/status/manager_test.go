@@ -694,9 +694,12 @@ func TestStatusManager(t *testing.T) {
 	log.Configure(logOpts)
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			newCrdWatcher := kube.NewCrdWatcher
+			kube.NewCrdWatcher = kube.NewFastCrdWatcher
 			kubeClient := kube.NewFakeClient(&corev1.Pod{
 				ObjectMeta: istiodName,
 			})
+			kube.NewCrdWatcher = newCrdWatcher
 			stop := make(chan struct{})
 			defer func() { close(stop) }()
 			cs := fake.NewSimpleClientset(
@@ -712,6 +715,7 @@ func TestStatusManager(t *testing.T) {
 			}
 			stopChan := make(chan struct{})
 			defer close(stopChan)
+			go kubeClient.RunAndWait(stopChan)
 			go rm.Start(stopChan)
 			cs.FederationV1().ServiceMeshPeers(namespace).Create(context.TODO(), &v1.ServiceMeshPeer{
 				ObjectMeta: meshName,

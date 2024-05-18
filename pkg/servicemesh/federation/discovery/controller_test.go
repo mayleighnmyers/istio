@@ -221,6 +221,8 @@ func TestReconcile(t *testing.T) {
 	namespace := "test"
 	resyncPeriod := 30 * time.Second
 	options := newTestOptions("test.address")
+	newCrdWatcher := kube.NewCrdWatcher
+	kube.NewCrdWatcher = kube.NewFastCrdWatcher
 	kubeClient := kube.NewFakeClient(
 		&corev1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
@@ -232,6 +234,7 @@ func TestReconcile(t *testing.T) {
 			},
 		},
 	)
+	kube.NewCrdWatcher = newCrdWatcher
 	rm, err := common.NewResourceManager(common.ControllerOptions{
 		KubeClient:   kubeClient,
 		MaistraCS:    fake.NewSimpleClientset(),
@@ -285,6 +288,7 @@ func TestReconcile(t *testing.T) {
 	}
 	stopCh := make(chan struct{})
 	defer close(stopCh)
+	go kubeClient.RunAndWait(stopCh)
 	go rm.Start(stopCh)
 	fedAdded := make(chan struct{})
 	fedDeleted := make(chan struct{})
