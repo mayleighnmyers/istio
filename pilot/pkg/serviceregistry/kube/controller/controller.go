@@ -697,6 +697,44 @@ func (c *Controller) getPodLocality(pod *v1.Pod) string {
 	return region + "/" + zone + "/" + subzone // Format: "%s/%s/%s"
 }
 
+func (c *Controller) InstancesByPort(svc *model.Service, reqSvcPort int) []*model.ServiceInstance {
+	// First get k8s standard service instances and the workload entry instances
+	outInstances := []*model.ServiceInstance{}
+	svcPort, exists := svc.Ports.GetByPort(reqSvcPort)
+	if exists {
+		for _, ep := range c.endpoints.endpointCache.Get(svc.Hostname) {
+			if svcPort.Name == ep.ServicePortName {
+				outInstances = append(outInstances, &model.ServiceInstance{
+					Service:     svc,
+					ServicePort: svcPort,
+					Endpoint:    ep,
+				})
+			}
+		}
+	}
+	outInstances = append(outInstances, c.serviceInstancesFromWorkloadInstances(svc, reqSvcPort)...)
+
+	// return when instances found or an error occurs
+	if len(outInstances) > 0 {
+		return outInstances
+	}
+
+	// Fall back to external name service since we did not find any instances of normal services
+	c.RLock()
+	service := c.servicesMap[svc.Hostname]
+	c.RUnlock()
+	if service != nil {
+		return slices.Map(kube.ExternalNameEndpoints(service), func(ep *model.IstioEndpoint) *model.ServiceInstance {
+			return &model.ServiceInstance{
+				Service:     svc,
+				ServicePort: svcPort,
+				Endpoint:    ep,
+			}
+		})
+	}
+	return nil
+}
+
 func (c *Controller) serviceInstancesFromWorkloadInstances(svc *model.Service, reqSvcPort int) []*model.ServiceInstance {
 	// Run through all the workload instances, select ones that match the service labels
 	// only if this is a kubernetes internal service and of ClientSideLB (eds) type

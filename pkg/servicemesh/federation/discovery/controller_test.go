@@ -188,7 +188,7 @@ func TestInvalidOptions(t *testing.T) {
 type options struct {
 	client            kube.Client
 	serviceController *aggregate.Controller
-	xdsUpdater        *model.EndpointIndexUpdater
+	xdsUpdater        model.XDSUpdater
 	env               *model.Environment
 }
 

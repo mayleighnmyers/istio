@@ -14,7 +14,9 @@
 
 package aggregate
 
-import "istio.io/istio/pilot/pkg/serviceregistry"
+import (
+	"istio.io/istio/pilot/pkg/serviceregistry"
+)
 
 // This file contains additional functions needed by Maistra distribution to provide
 // certain features. Keeping it in a separated file will make merging easier.
