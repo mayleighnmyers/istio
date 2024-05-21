@@ -405,7 +405,7 @@ func RunTemplate(params InjectionParameters) (mergedPod *corev1.Pod, templatePod
 		return nil, nil, err
 	}
 
-	proxyUID, proxyGID := GetProxyIDs(params.namespace)
+	// proxyUID, proxyGID := GetProxyIDs(params.namespace)
 
 	data := SidecarTemplateData{
 		TypeMeta:       params.typeMeta,
