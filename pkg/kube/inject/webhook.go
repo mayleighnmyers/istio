@@ -1166,7 +1166,7 @@ func (wh *Webhook) inject(ar *kube.AdmissionReview, path string) *kube.Admission
 		}
 	} else if tproxyInterceptionMode {
 		proxyUID = ptr.To(int64(0))
-		proxyGID = ptr.To(DefaultSidecarProxyGID)
+		proxyGID = ptr.To(iptablesconstants.DefaultProxyUIDInt)
 	} else {
 		// we're injecting a normal pod (with app container and optional sidecar container)
 		// we set proxyUID to the main app container's UID incremented by 1
@@ -1198,10 +1198,10 @@ func (wh *Webhook) inject(ar *kube.AdmissionReview, path string) *kube.Admission
 	// We need to set the UID/GID to something, or the injected manifest will fail to parse (this happens because
 	// {{ .ProxyUID/GID }} in the charts get resolved to "nil" (with quotes), which can't be parsed as a float).
 	if proxyUID == nil {
-		proxyUID = ptr.To(DefaultSidecarProxyUID)
+		proxyUID = ptr.To(iptablesconstants.DefaultProxyUIDInt)
 	}
 	if proxyGID == nil {
-		proxyGID = ptr.To(DefaultSidecarProxyUID)
+		proxyGID = ptr.To(iptablesconstants.DefaultProxyUIDInt)
 	}
 
 	deploy, typeMeta := kube.GetDeployMetaFromPod(&pod)

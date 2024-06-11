@@ -55,13 +55,6 @@ import (
 // sidecar proxy into the watched namespace(s).
 type InjectionPolicy string
 
-// Defaults values for injecting istio proxy into kubernetes
-// resources.
-const (
-	DefaultSidecarProxyUID = int64(1337)
-	DefaultSidecarProxyGID = int64(1337)
-)
-
 const (
 	// InjectionPolicyDisabled specifies that the sidecar injector
 	// will not inject the sidecar into resources by default for the
@@ -407,8 +400,6 @@ func RunTemplate(params InjectionParameters) (mergedPod *corev1.Pod, templatePod
 		return nil, nil, err
 	}
 
-	proxyUID, proxyGID := GetProxyIDs(params.namespace)
-
 	data := SidecarTemplateData{
 		TypeMeta:         params.typeMeta,
 		DeploymentMeta:   params.deployMeta,
@@ -419,8 +410,8 @@ func RunTemplate(params InjectionParameters) (mergedPod *corev1.Pod, templatePod
 		Values:           params.valuesConfig.asMap,
 		Revision:         params.revision,
 		ProxyImage:       ProxyImage(params.valuesConfig.asStruct, params.proxyConfig.Image, strippedPod.Annotations),
-		ProxyUID:         proxyUID,
-		ProxyGID:         proxyGID,
+		ProxyUID:         *params.proxyUID,
+		ProxyGID:         *params.proxyGID,
 		CompliancePolicy: common_features.CompliancePolicy,
 	}
 
@@ -784,8 +775,8 @@ func IntoObject(injector Injector, sidecarTemplate Templates, valuesConfig Value
 			revision:            revision,
 			proxyEnvs:           map[string]string{},
 			injectedAnnotations: nil,
-			proxyUID:            ptr.To(DefaultSidecarProxyUID),
-			proxyGID:            ptr.To(DefaultSidecarProxyGID),
+			proxyUID:            ptr.To(constants.DefaultProxyUIDInt),
+			proxyGID:            ptr.To(constants.DefaultProxyUIDInt),
 		}
 		patchBytes, err = injectPod(params)
 	}

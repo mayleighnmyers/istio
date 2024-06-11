@@ -50,6 +50,7 @@ import (
 	"istio.io/istio/pkg/test/util/tmpl"
 	"istio.io/istio/pkg/test/util/yml"
 	"istio.io/istio/pkg/util/sets"
+	iptablesconstants "istio.io/istio/tools/istio-iptables/pkg/constants"
 )
 
 // DeploymentController implements a controller that materializes a Gateway into an in cluster gateway proxy
@@ -323,12 +324,6 @@ func (d *DeploymentController) configureIstioGateway(log *istiolog.Scope, gw gat
 	}
 	log.Info("reconciling")
 
-	var ns *corev1.Namespace
-	if d.namespaces != nil {
-		ns = d.namespaces.Get(gw.Namespace, "")
-	}
-	proxyUID, proxyGID := inject.GetProxyIDs(ns)
-
 	defaultName := getDefaultName(gw.Name, &gw.Spec)
 
 	serviceType := gi.defaultServiceType
@@ -346,8 +341,8 @@ func (d *DeploymentController) configureIstioGateway(log *istiolog.Scope, gw gat
 		KubeVersion122: kube.IsAtLeastVersion(d.client, 22),
 		Revision:       d.revision,
 		ServiceType:    serviceType,
-		ProxyUID:       proxyUID,
-		ProxyGID:       proxyGID,
+		ProxyUID:       iptablesconstants.DefaultProxyUIDInt,
+		ProxyGID:       iptablesconstants.DefaultProxyUIDInt,
 	}
 
 	if overwriteControllerVersion {
